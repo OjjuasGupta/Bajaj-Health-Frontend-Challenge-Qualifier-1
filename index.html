@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Employee Filter/Search</title>
+</head>
+<body>
+  <label for="nameFilter">Search by Name:</label>
+  <input type="text" id="nameFilter" placeholder="Enter name">
+
+  <label for="designationFilter">Filter by Designation:</label>
+  <select id="designationFilter">
+    <option value="">All</option>
+    <option value="Senior Developer">Senior Developer</option>
+    <option value="QA Engineer">QA Engineer</option>
+    <option value="Project Manager">Project Manager</option>
+  </select>
+
+  <label for="skillsFilter">Filter by Skills:</label>
+  <select id="skillsFilter">
+    <option value="">All</option>
+    <option value="JavaScript">JavaScript</option>
+    <option value="Python">Python</option>
+    <option value="Java">Java</option>
+    <option value="HTML">HTML</option>
+    <option value="CSS">CSS</option>
+    <option value="Photoshop">Photoshop</option>
+    <option value="Manual Testing">Manual Testing</option>
+    <option value="SQL">SQL</option>
+  </select>
+
+  <table id="employeeTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Designation</th>
+        <th>Skills</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    // Fetch JSON data from the provided link
+    fetch("https://raw.githubusercontent.com/dixitsoham7/dixitsoham7.github.io/main/index.json")
+      .then(response => response.json())
+      .then(data => {
+        const employees = data.employees;
+
+        function renderEmployees(employees) {
+          const tableBody = document.querySelector("#employeeTable tbody");
+          tableBody.innerHTML = "";
+
+          for (const employee of employees) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${employee.id}</td>
+              <td>${employee.name || "-"}</td>
+              <td>${employee.designation || "-"}</td>
+              <td>${employee.skills.join(", ")}</td>
+            `;
+            tableBody.appendChild(row);
+          }
+        }
+
+        function filterEmployees() {
+          const nameFilter = document.querySelector("#nameFilter").value.trim().toLowerCase();
+          const designationFilter = document.querySelector("#designationFilter").value;
+          const skillsFilter = document.querySelector("#skillsFilter").value;
+
+          const filteredEmployees = employees.filter((employee) => {
+            const matchName = employee.name && employee.name.toLowerCase().includes(nameFilter);
+            const matchDesignation = designationFilter === "" || employee.designation === designationFilter;
+            const matchSkills = skillsFilter === "" || employee.skills.includes(skillsFilter);
+            return matchName && matchDesignation && matchSkills;
+          });
+
+          renderEmployees(filteredEmployees);
+        }
+
+        document.querySelector("#nameFilter").addEventListener("input", filterEmployees);
+        document.querySelector("#designationFilter").addEventListener("change", filterEmployees);
+        document.querySelector("#skillsFilter").addEventListener("change", filterEmployees);
+
+        // Initial rendering
+        renderEmployees(employees);
+      })
+      .catch(error => console.error("Error fetching JSON data:", error));
+  </script>
+</body>
+</html>
